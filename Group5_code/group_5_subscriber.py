@@ -3,7 +3,7 @@ import json
 from paho import mqtt
 
 BROKER_ADDRESS = "localhost"  # Change if needed
-TOPIC = "sensors/health"
+TOPIC = "sensors/temperature"
 
 
 
