@@ -1,4 +1,4 @@
-
+import threading
 import tkinter as tk
 from tkinter import Label, Entry, Button, Frame
 import random
@@ -22,6 +22,22 @@ class TemperatureSensor:
                                 min(self.current_temp, self.base_temp + self.variation))
         return (self.current_temp - (self.base_temp - self.variation)) / (2 * self.variation) * 100
 
+class SensorPublisher:
+    def __init__(self, sensor, broker="localhost", port=1883):
+        self.sensor = sensor
+        self.client = mqtt.Client(client_id=f"Publisher_{sensor.name}")
+        self.client.connect(broker, port)
+        self.thread = None
+
+    def start_publishing(self):
+        if self.thread and self.thread.is_alive():
+            return
+        self.sensor.running = True
+        self.thread = threading.Thread(target=self._publish_loop, daemon=True)
+        self.thread.start()
+
+    def stop_publishing(self):
+        self.sensor.running = False
 
 class PublisherChart(tk.Tk):
     def __init__(self, sensor):
